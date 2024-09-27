@@ -23,46 +23,47 @@ export default function ForYou(props) {
   };
 
   return (
-    <div>
-      <div className="h-12 w-72 mt-4 ml-32 bg-transparent rounded-md">
-        <label
-          htmlFor="default-search"
-          className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-        >
-          Search
-        </label>
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-              />
-            </svg>
+    <div className=" ml-32 min-w-full flex justify-start items-start  bg-transparent  ">
+      {/* Left column: Search and Music List */}
+      <div className="flex flex-col">
+        {/* Search bar */}
+        <div className="w-64 h-8 mt-4  bg-transparent rounded-md ">
+          <label
+            htmlFor="default-search"
+            className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+          >
+            Search
+          </label>
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              className="bg-white bg-opacity-20 block w-full h-10 pl-4 pr-10 text-sm text-gray-900 rounded-md outline-none dark:placeholder-gray-400 dark:text-white"
+              placeholder="Search Songs, Artist"
+              required
+            />
           </div>
-          <input
-            type="search"
-            id="default-search"
-            className="bg-white bg-opacity-20 block w-full h-10 pl-4 pr-10 text-sm text-gray-900 rounded-md outline-none dark:placeholder-gray-400 dark:text-white"
-            placeholder="Search Songs, Artist"
-            required
-          />
         </div>
-      </div>
 
-      <div className="ml-28 w-full p-4 flex">
-        {" "}
-        {/* Use flex here for horizontal layout */}
-        <div className="flex-grow">
+        {/* Music List */}
+        <div className="mt-4 flex-grow ">
           <div
             className="hide-scrollbar"
             style={{
@@ -113,16 +114,18 @@ export default function ForYou(props) {
             </div>
           </div>
         </div>
-        {isMusicPlaying && (
-          <div className="ml-20">
-            <AudioPlayerCard
-              spotifyData={spotifyData}
-              musicId={musicId}
-              activeTab={props?.activeButton}
-            />
-          </div>
-        )}
       </div>
+
+      {/* Right column: Audio Player */}
+      {isMusicPlaying && (
+        <div className="ml-4 w-1/3">
+          <AudioPlayerCard
+            spotifyData={spotifyData}
+            musicId={musicId}
+            activeTab={props?.activeButton}
+          />
+        </div>
+      )}
     </div>
   );
 }

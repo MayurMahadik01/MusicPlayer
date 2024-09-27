@@ -1,202 +1,188 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+import Previous from "../Buttons/Previous";
+import Play from "../Buttons/Play";
+import Pause from "../Buttons/Pause";
+import Next from "../Buttons/Next";
+import Volume from "../Buttons/Volume";
+import More from "../Buttons/More";
 
 export default function AudioPlayerCard(props) {
   const { spotifyData, activeTab, musicId } = props;
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentMusic, setCurrentMusic] = useState([]);
-  const [activeMusicId, setActiveMusicId] = useState(musicId);
+  const [activeMusicId, setActiveMusicId] = useState("");
+  const [activeButton, setActiveButton] = useState(null);
 
   const audioRef = useRef(null);
 
   const handlePlayPause = () => {
-    setIsPlaying((prevState) => !prevState); // Toggle between play and pause
-
-    // Control the audio playback
-    if (!isPlaying) {
-      audioRef.current.play(); // Play the audio if not already playing
-    } else {
-      audioRef.current.pause(); // Pause the audio if it's playing
-    }
-  };
-
-  const playAudio = () => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.play();
-    }
+    setIsPlaying((prevState) => {
+      const newState = !prevState;
+      if (newState) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+      return newState;
+    });
   };
 
   const handlePrevious = () => {
+    setActiveButton("previous");
+    document.body.style.background = "linear-gradient(108.18deg, #201606 2.46%, #000000 99.84%)";
     if (activeTab === "Top Tracks") {
       let topTrack = spotifyData.filter((val) => val.top_track === true);
       let index = topTrack.findIndex((item) => item.id === activeMusicId);
 
       if (index !== 0) {
         let previousIndex = index - 1;
-        let selectedSong = topTrack.filter(
-          (_, index) => index === previousIndex
-        );
+        let selectedSong = topTrack.filter((_, index) => index === previousIndex);
         setCurrentMusic(selectedSong);
         setActiveMusicId(selectedSong[0]?.id ?? topTrack[0].id);
         setIsPlaying(true);
-      }else{
-        let topTrack = spotifyData.filter((val) => val.top_track === true);
-        setActiveMusicId(topTrack[topTrack.length - 1].id)
       }
     } else {
       let index = spotifyData.findIndex((item) => item.id === activeMusicId);
       if (index !== 0) {
         let previousIndex = index - 1;
-        let selectedSong = spotifyData.filter(
-          (_, index) => index === previousIndex
-        );
+        let selectedSong = spotifyData.filter((_, index) => index === previousIndex);
         setCurrentMusic(selectedSong);
         setActiveMusicId(selectedSong[0].id);
         setIsPlaying(true);
-        console.log("--->", index, previousIndex, selectedSong);
-      } else {
-        let topTrack = spotifyData.filter((val) => val.top_track === true);
-        setActiveMusicId(topTrack[topTrack.length - 1].id);
       }
     }
   };
 
   const handleNext = () => {
-    console.log("---> Yoou have clicked next");
+    setActiveButton("next");
+    document.body.style.background = "linear-gradient(108.18deg, #33425E99 2.46%, #000000 99.84%)";
+
     if (activeTab === "Top Tracks") {
       let topTrack = spotifyData.filter((val) => val.top_track === true);
       let index = topTrack.findIndex((item) => item.id === activeMusicId);
 
       if (index !== topTrack.length - 1) {
-        let previousIndex = index + 1;
-        let selectedSong = topTrack.filter(
-          (_, index) => index === previousIndex
-        );
+        let nextIndex = index + 1;
+        let selectedSong = topTrack.filter((_, index) => index === nextIndex);
         setCurrentMusic(selectedSong);
         setActiveMusicId(selectedSong[0]?.id ?? topTrack[0].id);
-        setIsPlaying(true);
-      } else {
-        let topTrack = spotifyData.filter((val) => val.top_track === true);
-        setActiveMusicId(topTrack[0].id);
+        setIsPlaying(true);        
       }
     } else {
       let index = spotifyData.findIndex((item) => item.id === activeMusicId);
       if (index !== spotifyData.length - 1) {
-        let previousIndex = index + 1;
-        let selectedSong = spotifyData.filter(
-          (_, index) => index === previousIndex
-        );
+        let nextIndex = index + 1;
+        let selectedSong = spotifyData.filter((_, index) => index === nextIndex);
         setCurrentMusic(selectedSong);
         setActiveMusicId(selectedSong[0].id);
         setIsPlaying(true);
-        console.log("--->", index, previousIndex, selectedSong);
-      } else {
-        setActiveMusicId(spotifyData[0].id);
       }
     }
   };
 
   useEffect(() => {
-    let selectedMusic = spotifyData.filter(
-      (value) => value.id === activeMusicId
-    );
+    let selectedMusic = spotifyData.filter((value) => value.id === musicId);
     setCurrentMusic(selectedMusic);
-    setActiveMusicId(musicId)
+    setActiveMusicId(musicId);
+    
     const timeout = setTimeout(() => {
       if (audioRef.current) {
-        playAudio();
+        audioRef.current.play();
       }
-    }, 100); // Slight delay to ensure audio element is rendered
+    }, 100);
 
-    return () => clearTimeout(timeout); // Clean up the timeout
-    
-  }, [activeMusicId, activeTab,musicId]);
-  console.log(currentMusic);
+    return () => clearTimeout(timeout);
+  }, [activeTab, musicId]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [activeMusicId]);
+
+  useEffect(() => {
+    console.log("Active Button Changed:", activeButton); // Debug log
+    if (activeButton === "previous") {
+      document.body.style.background = "linear-gradient(108.18deg, #201606 2.46%, #000000 99.84%)"; 
+    } else if (activeButton === "next") {
+      document.body.style.background = "linear-gradient(108.18deg,#33425E99 2.46%, #000000 99.84% )";
+    } else {
+      document.body.style.backgroundColor = ""; 
+    }
+
+    return () => {
+      document.body.style.backgroundColor = ""; // Reset background on unmount
+    };
+  }, [activeButton]);
 
   return (
-    <div className="flex flex-col items-center justify-center bg-transparent">
-      <div className="w-full max-w-md">
-        {currentMusic.length &&
-          currentMusic.map((val) => (
-            <div key={val.id} className="flex flex-col items-center">
-              {/* Song Info */}
-              <div className="p-4 text-center">
-                <h5 className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
-                  {val.name}
-                </h5>
-                <p className="mb-2 text-sm text-gray-700 dark:text-gray-400">
-                  {val.artist}
-                </p>
-              </div>
-
-              {/* Image */}
-              <div className="h-5/6 w-2/4">
-                <img
-                  className="object-cover rounded-lg"
-                  src={`https://cms.samespace.com/assets/${val.cover}`}
-                  alt={val.name}
-                />
-              </div>
-              <div>
-                <audio ref={audioRef} src={val.url} />
-              </div>
+    <div className="flex flex-col bg-transparent">
+      <div className="ml-40 w-96 h-100 p-3">
+        {currentMusic.length > 0 && currentMusic.map((val) => (
+          <div key={val.id} className="flex flex-col">
+            {/* Song Info */}
+            <div className="text-left">
+              <h5 className="mb-1 text-3xl font-bold text-gray-900 dark:text-white">
+                {val.name}
+              </h5>
+              <p className="mb-2 text-xs text-gray-700 dark:text-gray-400">
+                {val.artist}
+              </p>
             </div>
-          ))}
+
+            {/* Image */}
+            <div>
+              <img
+                className="mt-3 object-cover rounded-lg h-80 w-80"
+                src={`https://cms.samespace.com/assets/${val.cover}`}
+                alt={val.name}
+              />
+            </div>
+            <div>
+              <audio ref={audioRef} src={val.url} />
+            </div>
+          </div>
+        ))}
 
         {/* Control Buttons */}
-        <div className="flex justify-center items-center mt-4 gap-4">
-          {/* Previous button */}
-          <button onClick={handlePrevious}>
-            <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M11 12L22 3v18L11 12zM2 21h4V3H2v18z" />
-            </svg>
-          </button>
+        <div className="flex justify-between items-center mt-4 w-full max-w-lg mx-auto">
+          {/* Left-aligned More button */}
+          <div className="flex-shrink-2">
+            <button className="w-14">
+              <More />
+            </button>
+          </div>
 
-          {/* Play/Pause button */}
-          <button onClick={handlePlayPause}>
-            {isPlaying ? (
-              <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M6 22h4V2H6v20zM14 2v20h4V2h-4z" />
-              </svg>
-            ) : (
-              <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M3 22V2l18 10L3 22z" />
-              </svg>
-            )}
-          </button>
+          <div className="flex justify-center items-center">
+            {/* Center-aligned Previous, Play/Pause, and Next buttons */}
+            <div className="flex gap-2 justify-center items-center">
+              {/* Previous button */}
+              <button onClick={handlePrevious} className="w-14">
+                <Previous />
+              </button>
 
-          {/* Next button */}
-          <button onClick={handleNext}>
-            <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M2 3v18l11-9L2 3zm13 18h4V3h-4v18z" />
-            </svg>
-          </button>
+              {/* Play/Pause button */}
+              <button onClick={handlePlayPause} className="w-14">
+                {isPlaying ? <Pause /> : <Play />}
+              </button>
+
+              {/* Next button */}
+              <button onClick={handleNext} className="w-14">
+                <Next />
+              </button>
+            </div>
+          </div>
+
+          {/* Right-aligned Volume button */}
+          <div className="flex-shrink-0">
+            <button className="w-14">
+              <Volume />
+            </button>
+          </div>
         </div>
       </div>
     </div>
